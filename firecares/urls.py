@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 from .firecares_core.forms import FirecaresPasswordResetForm
@@ -7,6 +8,7 @@ from .firecares_core.views import ForgotUsername
 from .firestation.api import StaffingResource, FireStationResource, FireDepartmentResource
 from tastypie.api import Api
 from firestation.views import Home
+from .sitemaps import BaseSitemap
 
 admin.autodiscover()
 v1_api = Api(api_name='v1')
@@ -14,6 +16,9 @@ v1_api.register(StaffingResource())
 v1_api.register(FireStationResource())
 v1_api.register(FireDepartmentResource())
 
+sitemaps = {
+  'base': BaseSitemap,
+}
 
 urlpatterns = patterns('',
     url(r'^$', cache_page(60 * 60 * 24)(Home.as_view()), name='firestation_home'),
@@ -43,4 +48,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^autocomplete/', include('autocomplete_light.urls')),
     url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots.txt'),
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 )
